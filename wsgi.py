@@ -6,6 +6,7 @@ import sys
 app = Flask(__name__)
 developer_db = json.load(open('resources/sponsors.json', 'r'))
 sponsors_db = json.load(open('resources/sponsorees.json', 'r'))
+ams_db = json.load(open('resources/ams.json', 'r'))
 
 def traverse(developer, tree):
     ret = {}
@@ -23,10 +24,14 @@ def get_sponsor_tree(developer):
 def get_sponsorees_tree(developer):
     return traverse(developer, sponsors_db)
 
+def get_ams_tree(developer):
+    return traverse(developer, ams_db)
+
 def get_nodes(developer):
     sponsors = get_sponsor_tree(developer)
     sponsorees = get_sponsorees_tree(developer)
-    return ( sponsors, sponsorees )
+    ams = get_ams_tree(developer)
+    return ( sponsors, sponsorees, ams )
 
 @app.route("/")
 def index():
@@ -40,13 +45,11 @@ def view(username):
 
 @app.route("/user/<username>/endpoint.json")
 def user(username):
-    try:
-        sponsors, sponsorees = get_nodes(username)
-    except KeyError as e:
-        return "KeyError " + str(e)
+    sponsors, sponsorees, ams = get_nodes(username)
     return json.dumps({
         "advocates": sponsors,
-        "advocated": sponsorees
+        "advocated": sponsorees,
+        "am": ams
     })
 
 if __name__ == "__main__":
