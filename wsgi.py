@@ -32,6 +32,12 @@ def get_nodes(developer):
 def index():
     return render_template('index.html', **{})
 
+@app.route("/view/<username>")
+def view(username):
+    return render_template('view.html', **{
+        "person": username
+    })
+
 @app.route("/user/<username>/endpoint.json")
 def user(username):
     try:
