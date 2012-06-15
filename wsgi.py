@@ -16,7 +16,6 @@ def traverse(developer, tree):
         active[developer] = active_db[developer]
         ret[developer] = tree[developer]
         for entity in tree[developer]:
-            print entity
 
             r, a = traverse(entity, tree)
             ret.update(r)
