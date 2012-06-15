@@ -7,16 +7,25 @@ app = Flask(__name__)
 developer_db = json.load(open('resources/sponsors.json', 'r'))
 sponsors_db = json.load(open('resources/sponsorees.json', 'r'))
 ams_db = json.load(open('resources/ams.json', 'r'))
+active_db = json.load(open('resources/active.json', 'r'))
 
 def traverse(developer, tree):
     ret = {}
+    active = {}
     try:
+        active[developer] = active_db[developer]
         ret[developer] = tree[developer]
         for entity in tree[developer]:
-            ret.update(traverse(entity, tree))
+            print entity
+
+            r, a = traverse(entity, tree)
+            ret.update(r)
+            active.update(a)
     except KeyError:
         pass
-    return ret
+    for dev in ret:
+        active[dev] = active_db[dev]
+    return ret, active
 
 def get_sponsor_tree(developer):
     return traverse(developer, developer_db)
@@ -28,10 +37,14 @@ def get_ams_tree(developer):
     return traverse(developer, ams_db)
 
 def get_nodes(developer):
-    sponsors = get_sponsor_tree(developer)
-    sponsorees = get_sponsorees_tree(developer)
-    ams = get_ams_tree(developer)
-    return ( sponsors, sponsorees, ams )
+    active = {}
+    sponsors, aSpon = get_sponsor_tree(developer)
+    active.update(aSpon)
+    sponsorees, aSpon = get_sponsorees_tree(developer)
+    active.update(aSpon)
+    ams, aAM = get_ams_tree(developer)
+    active.update(aAM)
+    return ( sponsors, sponsorees, ams, active )
 
 @app.route("/")
 def index():
@@ -45,12 +58,13 @@ def view(username):
 
 @app.route("/user/<username>/endpoint.json")
 def user(username):
-    sponsors, sponsorees, ams = get_nodes(username)
+    sponsors, sponsorees, ams, active = get_nodes(username)
     return json.dumps({
         "advocates": sponsors,
         "advocated": sponsorees,
-        "am": ams
+        "am": ams,
+        "active": active
     })
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

@@ -99,6 +99,16 @@ text.shadow {
               link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
             });
 
+            function color(node_name) {
+                if ( data.active[node_name] === true ) {
+                    return "#0000FF";
+                } else if ( data.active[node_name] === false ) {
+                    return "#FF0000";
+                } else {
+                    return "#DCDCDC";
+                }
+            }
+
             var w = $(document).width(),
                 h = $(document).height();
 
@@ -139,6 +149,8 @@ text.shadow {
                 .data(force.nodes())
               .enter().append("svg:circle")
                 .attr("r", 6)
+                .attr("id", function(d){ return d.name; })
+                .style("fill", function(d) { return color(d.name); })
                 .call(force.drag);
 
             var text = svg.append("svg:g").selectAll("g")
