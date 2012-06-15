@@ -109,6 +109,10 @@ text.shadow {
                 }
             }
 
+            function click(node) {
+                window.location = "/view/" + node.name;
+            }
+
             var w = $(document).width(),
                 h = $(document).height();
 
@@ -151,10 +155,11 @@ text.shadow {
                 .attr("r", 6)
                 .attr("id", function(d){ return d.name; })
                 .style("fill", function(d) { return color(d.name); })
+                .on("click", click)
                 .call(force.drag);
 
             var text = svg.append("svg:g").selectAll("g")
-                .data(force.nodes())
+              .data(force.nodes())
               .enter().append("svg:g");
 
             // A copy of the text with a thick white stroke for legibility.
